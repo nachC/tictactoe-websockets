@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>TIC-TAC-TOE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
+        crossorigin="anonymous">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font: 13px Helvetica, Arial;
+        }
+
+        .title {
+            padding: 10px;
+            text-align: center;
+        }
+
+        #board {
+            text-align: center;
+        }
+
+        .row {
+            margin: auto;
+            padding: 0;
+            width: 300px;
+            height: 100px;
+        }
+
+        .cell {
+            background: #ccc;
+            border: solid 0.5px black;
+        }
+
+        #mark {
+            font-size: 2rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h2 class="title">TIC-TAC-TOE</h2>
+
+    <div class="container-fluid">
+        <div id="board">
+        </div>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        $(function () {
+            const socket = io();
+
+            for (let i = 0; i < 3; i++) {
+                $('#board').append('<div class="row justify-content-center"></div>')
+            }
+            for (let i = 0; i < 3; i++) {
+                $('.row').append('<div class="col-4 cell"></div>');
+            }
+            $('.cell').each((i,e) => $(e).append(`<span id="${i}"></span>`));
+
+            $('.cell').click(function() {
+                //play event here
+                socket.emit('play turn', $(this).children('span').attr('id'));
+                console.log($(this).children('span').attr('id'));
+                $(this).children('span').text('X');
+            });
+
+            socket.on('play turn', (cellId) => {
+                console.log(cellId);
+                $(`#${cellId}`).text('X');
+            });
+        });
+    </script>
+</body>
+
+</html>
