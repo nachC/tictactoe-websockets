@@ -71,18 +71,21 @@
             for (let i = 0; i < 3; i++) {
                 $('.row').append('<div class="col-4 cell"></div>');
             }
-            $('.cell').each((i,e) => $(e).append(`<span id="${i}"></span>`));
+            $('.cell').each((i, e) => $(e).append(`<span id="${i}"></span>`));
 
-            $('.cell').click(function() {
+            $('.cell').click(function () {
                 //play event here
                 socket.emit('play turn', $(this).children('span').attr('id'));
-                console.log($(this).children('span').attr('id'));
-                $(this).children('span').text('X');
+                $(this).children('span').text('X'); //this should happen IF it's this client's turn
             });
 
-            socket.on('play turn', (cellId) => {
-                console.log(cellId);
-                $(`#${cellId}`).text('X');
+            socket.on('play turn', (data) => {
+                if (!data.activeTurn) {
+                    console.log("invalid turn html")
+                } else if (data.activeTurn) {
+                    console.log('valid turn html')
+                    $(`#${data.cellId}`).text('X');
+                }
             });
         });
     </script>
