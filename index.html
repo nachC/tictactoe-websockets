@@ -4,8 +4,8 @@
 <head>
     <title>TIC-TAC-TOE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
-        crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <style>
         * {
             margin: 0;
@@ -44,7 +44,7 @@
     </style>
 </head>
 
-<body>
+<body onload="drawGameBoard()">
     <h2 class="title">TIC-TAC-TOE</h2>
 
     <div class="container-fluid">
@@ -53,18 +53,19 @@
     </div>
 
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
         crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
         crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
 
     <script>
-        $(function () {
-            const socket = io();
-
+        function drawGameBoard() {
             for (let i = 0; i < 3; i++) {
                 $('#board').append('<div class="row justify-content-center"></div>')
             }
@@ -72,16 +73,26 @@
                 $('.row').append('<div class="col-4 cell"></div>');
             }
             $('.cell').each((i, e) => $(e).append(`<span id="${i}"></span>`));
+        }
+
+        $(function () {
+            const socket = io();
+            let cellClicked = null;
 
             $('.cell').click(function () {
-                //play event here
+                //emit play event when clicking a cell
                 socket.emit('play turn', $(this).children('span').attr('id'));
-                $(this).children('span').text('X'); //this should happen IF it's this client's turn
+                cellClicked = $(this).children('span');
+            });
+
+            socket.on('valid turn', (char) => {
+                console.log('valid turn event')
+                cellClicked.text(char);
             });
 
             socket.on('play turn', (data) => {
                 if (!data.activeTurn) {
-                    console.log("invalid turn html")
+                    console.log(data.errorMsg)
                 } else if (data.activeTurn) {
                     console.log('valid turn html')
                     $(`#${data.cellId}`).text('X');

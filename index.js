@@ -3,11 +3,16 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
 const User = require('./models/user');
+const GameState = require('./models/game-state');
 
 //sets the number of the current available room
 let roomNumber = 0;
-//holds all users connected to the server
+//holds all clients connected to the server - { client : new User() }
 let users = {};
+//holds the game state for each room  - { room : new GameState(...) }
+let roomsGameState = {};
+
+let players = {};
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -18,41 +23,50 @@ io.on('connection', function (socket) {
   console.log('a user connected');
   users[socket.id] = new User();
 
-  if (io.sockets.adapter.rooms[`room ${roomNumber}`] === undefined
-    || io.sockets.adapter.rooms[`room ${roomNumber}`].length < 2) {
-    socket.join(`room ${roomNumber}`);
+  if (io.sockets.adapter.rooms[`room ${roomNumber}`] === undefined || io.sockets.adapter.rooms[`room ${roomNumber}`].length < 2) {
+    players[socket.id] = false;
+
     users[socket.id].room = `room ${roomNumber}`;
-    console.log(`user joined room ${roomNumber}`)
-    if(io.sockets.adapter.rooms[`room ${roomNumber}`].length === 2) {
+    socket.join(`room ${roomNumber}`);
+    console.log(`user joined room ${roomNumber}`);
+
+    if (io.sockets.adapter.rooms[`room ${roomNumber}`].length === 2) {
+      players[socket.id] = false;
       //start game (choose who starts first)
       let firstToPlay = Object.keys(io.sockets.adapter.rooms[users[socket.id].room].sockets)[Math.round(Math.random())];
       users[firstToPlay].activeTurn = true;
+      players[firstToPlay] = true;
+      //set this room's GameState
+      roomsGameState[`room ${roomNumber}`] = new GameState(players);
     }
   } else {
+    players = {}; //reset players object for new room
+    players[socket.id] = false;
+
     roomNumber++;
-    socket.join(`room ${roomNumber}`);
     users[socket.id].room = `room ${roomNumber}`;
+    socket.join(`room ${roomNumber}`);
     console.log(`sent user to room ${roomNumber}`);
   }
 
   //PLAY EVENT
   socket.on('play turn', (cellId) => {
-    //check if it's this player's turn to play
-    data = { cellId, activeTurn: users[socket.id].activeTurn }
-    if (!users[socket.id].activeTurn) {
-      console.log('invalid turn')
-      socket.emit('play turn', data);
-    } else {
-      for(user in io.sockets.adapter.rooms[users[socket.id].room].sockets) {
-        if(socket.id == user) {
-          users[socket.id].activeTurn = false;
-        }else{
-          users[user].activeTurn = true;
-        }
-      }
-      //need to save game state
+    if (!roomsGameState[users[socket.id].room].play(socket.id, cellId).error.exists) {
+      //if it's a valid turn -> play
       console.log('valid turn')
-      socket.broadcast.to(users[socket.id].room).emit('play turn', data);
+      socket.emit('valid turn', 'O');
+      socket.broadcast.to(users[socket.id].room).emit('play turn', {
+        cellId,
+        activeTurn: true
+      });
+    } else {
+      //if it's an invalid turn -> error
+      console.log('invalid turn')
+      console.log(roomsGameState[users[socket.id].room].play(socket.id, cellId).error.message)
+      socket.emit('play turn', {
+        activeTurn: false,
+        errorMsg: roomsGameState[users[socket.id].room].play(socket.id, cellId).error.message
+      });
     }
   });
 
