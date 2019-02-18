@@ -1,8 +1,9 @@
 class User {
     constructor() {
         this._room = '';
-        this._activeTurn = false;
         this._usedCells = [];
+        this._symbol = '';
+        this._username = '';
     }
 
     get room() {
@@ -12,6 +13,14 @@ class User {
     set room(r) {
         if (typeof r === 'string')
             this._room = r;
+    }
+
+    get username() {
+        return this._username;
+    }
+
+    set username(username) {
+        this._username = username;
     }
 
     get activeTurn() {
