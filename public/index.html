@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>TIC-TAC-TOE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
+        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+
+<body onload="drawGameBoard()">
+    <h2 class="title">TIC-TAC-TOE</h2>
+
+    <div class="container-fluid">
+        <div class="description">
+            This project is part of the process of introducing myself to websockets, specifically through Socket.io. The
+            <strong><i>focus</i></strong> of this project was to learn about the connection and communication between clients
+            through a server, using websockets.
+            <a href="https://github.com/nachC/tictactoe-websockets" target="blank">Here</a> you can find the source
+            code.
+        </div>
+        <div class="row content-row">
+            <div class="col-xs-12 col-md-3 players-details">
+                <div class="form-group username">
+                    <input id="username-input" name="username" class="form-control" type="text"
+                        placeholder="Enter username" autocomplete="off">
+                    <label id="username-label" for="username"></label>
+                    <button id="username-form" class="button button-outline">ENTER</button>
+                </div>
+                <div class="alert alert-success">
+                </div>
+                <div class="card text-white players-info">
+                    <div class="card-header"></div>
+                    <div class="card-body score">Score: </div> 
+                </div>
+            </div>
+            <div id="board" class="col-xs-12 col-md-6" style="margin: 10px 0">
+            </div>
+            <div class="col-xs-12 col-md-3 chat-window">
+                <div class="row" style="height: 300px; overflow-y: auto">
+                    <div class="col-xs-12">
+                        <ul id="messages" class="list-unstyled" style="padding: 2px; margin-left: 2px"></ul>
+                        <form id="chat-form" action="">
+                            <input id="m" class="chat-input" autocomplete="off" placeholder="trash talk here"
+                                style="width: 100%" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="color: #45A29E; text-align: center; margin-top: 10px"><strong>Note:</strong> don't refresh the page
+            or you might get
+            redirected to another room.
+        </div>
+    </div>
+    <div class="footer">
+        <a href="https://github.com/nachC" target="blank">GitHub</a>
+        <span style="margin: 0 5px"></span>
+        <a href="https://linkedin.com/in/ignaciocedeno" target="blank">LinkedIn</a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
+        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
+        crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./js/functions.js"></script>
+</body>
+
+</html>

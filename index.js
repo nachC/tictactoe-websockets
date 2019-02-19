@@ -1,4 +1,5 @@
-const app = require('express')();
+const express = require('express');
+const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
@@ -11,9 +12,11 @@ let roomNumber = 0;
 let users = {};
 //holds the game state for each room  - { room : new GameState(...) }
 let roomsGameState = {};
-
+//hold pair of clients that belong to same room.
+//gets resetted after GameState is created for that room and a new room 'opens'
 let players = {};
 
+app.use(express.static(__dirname + '/public'));
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
 });
@@ -90,7 +93,7 @@ io.on('connection', function (socket) {
 
   //SET USERNAME
   socket.on('set username', (data) => {
-    //can't set an empty username
+    //can't set an empty username nor one with more than 10 chars
     if (data === '') return;
     if (data.length > 10) return;
 
@@ -101,8 +104,10 @@ io.on('connection', function (socket) {
     if (Object.keys(io.sockets.adapter.rooms[users[socket.id].room].sockets).length === 2) {
       let usernames = [];
       let flag = true;
+      //for every user connected to the room
       for (user in io.sockets.adapter.rooms[users[socket.id].room].sockets) {
         if (users[user].username === '') {
+          //user hasn't set their username -> set flag to false and break
           flag = false;
           break;
         }
@@ -123,7 +128,7 @@ io.on('connection', function (socket) {
         });
       }
     } else {
-      //user sets username but has to wait for another user to join room
+      //user set username but has to wait for another user to join room
       socket.emit('set username', {
         success: false,
         message: 'Waiting for another player to join...'
@@ -135,6 +140,7 @@ io.on('connection', function (socket) {
   //EVENT FOR USER DISCONNECTED
   socket.on('disconnect', () => {
     console.log('user disconnected', users[socket.id]);
+    socket.broadcast.to(users[socket.id].room).emit('user disconnect', 'Opponent disconnected');
     delete users[socket.id];
   });
 });
