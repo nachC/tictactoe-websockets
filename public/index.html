@@ -15,12 +15,14 @@
     <div class="container-fluid">
         <div class="description">
             This project is part of the process of introducing myself to websockets, specifically through Socket.io. The
-            <strong><i>focus</i></strong> of this project was to learn about the connection and communication between clients
+            <strong><i>focus</i></strong> of this project was to learn about the connection and communication between
+            clients
             through a server, using websockets.
             <a href="https://github.com/nachC/tictactoe-websockets" target="blank">Here</a> you can find the source
             code.
         </div>
         <div class="row content-row">
+            <!-- LEFT/UPPER PANEL - PLAYER DETAILS/SCORES/GAMEPLAY ERROR ALERTS -->
             <div class="col-xs-12 col-md-3 players-details">
                 <div class="form-group username">
                     <input id="username-input" name="username" class="form-control" type="text"
@@ -28,15 +30,22 @@
                     <label id="username-label" for="username"></label>
                     <button id="username-form" class="button button-outline">ENTER</button>
                 </div>
-                <div class="alert alert-success">
+                <div class="alert alert-success user-alert">
                 </div>
                 <div class="card text-white players-info">
                     <div class="card-header"></div>
-                    <div class="card-body score">Score: </div> 
+                    <div class="card-body">
+                        <p id="room"></p>
+                        <p id="score"></p>
+                    </div>
+                </div>
+                <div class="alert alert-danger gameplay-alert">
                 </div>
             </div>
+            <!--------- GAME BOARD --------->
             <div id="board" class="col-xs-12 col-md-6" style="margin: 10px 0">
             </div>
+            <!--------- CHAT WINDOW -------->
             <div class="col-xs-12 col-md-3 chat-window">
                 <div class="row" style="height: 300px; overflow-y: auto">
                     <div class="col-xs-12">
@@ -54,6 +63,7 @@
             redirected to another room.
         </div>
     </div>
+    <!--------- FOOTER -------->
     <div class="footer">
         <a href="https://github.com/nachC" target="blank">GitHub</a>
         <span style="margin: 0 5px"></span>

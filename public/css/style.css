@@ -43,7 +43,7 @@ body {
 
 /* LEFT PANEL - USERNAME INPUT / PLAYERS DETAILS  */
 .players-details {
-    border: solid 1px #45A29E;
+    /* border: solid 1px #45A29E; */
 }
 
 .username {
@@ -64,7 +64,6 @@ body {
 
 .players-info {
     display: none;
-    /* visibility: hidden; */
     background-color: #45A29E;
     margin: 20px auto;
     text-align: center;
@@ -74,8 +73,8 @@ body {
 
 .alert {
     display: none;
-    /* visibility: hidden; */
     margin: 25px auto;
+    text-align: center;
 }
 
 /* CENTER PANEL - GAME BOARD  */

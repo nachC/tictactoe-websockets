@@ -85,12 +85,6 @@ io.on('connection', function (socket) {
     }
   });
 
-  //CHAT EVENTS  
-  socket.on('chat message', (data) => {
-    //emits chat message data to all clients but the sender
-    socket.to(users[socket.id].room).emit('chat message', data);
-  });
-
   //SET USERNAME
   socket.on('set username', (data) => {
     //can't set an empty username nor one with more than 10 chars
@@ -118,7 +112,8 @@ io.on('connection', function (socket) {
         //both usernames are set -> send successful reply with usernames
         io.in(`${users[socket.id].room}`).emit('set username', {
           success: true,
-          usernames
+          usernames,
+          room: users[socket.id].room
         });
       } else {
         //only one user in the room has set their username
@@ -136,8 +131,13 @@ io.on('connection', function (socket) {
     }
   });
 
+  //////// CHAT EVENTS ///////////
+  socket.on('chat message', message => {
+    //emits chat message data to all clients but the sender
+    socket.to(users[socket.id].room).emit('chat message', message);
+  });
 
-  //EVENT FOR USER DISCONNECTED
+  /////////// EVENT FOR USER DISCONNECTED /////////
   socket.on('disconnect', () => {
     console.log('user disconnected', users[socket.id]);
     socket.broadcast.to(users[socket.id].room).emit('user disconnect', 'Opponent disconnected');

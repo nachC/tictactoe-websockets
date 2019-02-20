@@ -26,20 +26,20 @@ $(function () {
     });
 
     /******* SET USERNAME EVENT *********/
-    socket.on('set username', (data) => {
-        console.log(data);
+    socket.on('set username', data => {
         //hide username form
         $('.username').hide();
-
         //evaluate if the event 'set username' responds with successful data or not
         if (!data.success) {
             //in case of unsuccessful response -> show alert with message
-            $('.alert').text(data.message);
-            $('.alert').css('display', 'block');
+            $('.user-alert').text(data.message);
+            $('.user-alert').css('display', 'block');
         } else {
-            //in case of successful responde -> hide alert (if shown) and set players-info data and visibility
-            $('.alert').hide();
-            $('.card-header').text(data.usernames[0] + ' vs ' + data.usernames[1])
+            //in case of successful responde -> hide alert (if shown) and set players-info data and display
+            $('.user-alert').hide();
+            $('.card-header').text(data.usernames[0] + ' vs ' + data.usernames[1]);
+            $('.card-body').children('#room').text(data.room);
+            $('.card-body').children('#score').text('Score');
             $('.players-info').css('display', 'block');
             //allow clicking the board after usernames are set
             $('#board').css('pointer-events', 'all');
@@ -58,14 +58,18 @@ $(function () {
     //if it was a valid turn, it sets the symbol
     socket.on('valid turn', (symbol) => {
         cellClicked.text(symbol);
+        $('.gameplay-alert').hide();
     });
 
     //event recived when the other player plays
     socket.on('play turn', (data) => {
         if (!data.activeTurn) {
             console.log(data.errorMsg)
+            $('.gameplay-alert').text(data.errorMsg);
+            $('.gameplay-alert').css('display', 'block')
         } else if (data.activeTurn) {
             console.log('valid turn html')
+            $('.gameplay-alert').hide();
             $(`#${data.cellId}`).text(data.symbol);
         }
     });
