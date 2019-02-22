@@ -82,7 +82,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  //RESET GAME
+  //////// RESET GAME /////////
   socket.on('reset game', () => {
     roomsGameState[users[socket.id].room].reset();
     if (roomsGameState[users[socket.id].room].getActiveTurn() === socket.id) {
@@ -90,7 +90,7 @@ io.on('connection', function (socket) {
     }
   });
 
-  //SET USERNAME
+  //////// SET USERNAME ////////
   socket.on('set username', data => {
     //can't set an empty username nor one with more than 10 chars
     if (data === '') return;
