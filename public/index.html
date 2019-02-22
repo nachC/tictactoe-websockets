@@ -4,9 +4,8 @@
 <head>
     <title>TIC-TAC-TOE</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
-        integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
 </head>
 
 <body onload="drawGameBoard()">
@@ -36,10 +35,12 @@
                     <div class="card-header"></div>
                     <div class="card-body">
                         <p id="room"></p>
-                        <p id="score"></p>
+                        <!-- <p id="score"></p> -->
                     </div>
                 </div>
                 <div class="alert alert-danger gameplay-alert">
+                </div>
+                <div class="alert alert-primary turn-alert">
                 </div>
             </div>
             <!--------- GAME BOARD --------->
@@ -59,7 +60,7 @@
             </div>
         </div>
         <div style="color: #45A29E; text-align: center; margin-top: 10px"><strong>Note:</strong> don't refresh the page
-            or you might get
+            or you will be
             redirected to another room.
         </div>
     </div>
@@ -70,15 +71,9 @@
         <a href="https://linkedin.com/in/ignaciocedeno" target="blank">LinkedIn</a>
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
-        integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
-        crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
-        integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
-        crossorigin="anonymous"></script>
+    <script src="./js/jquery.slim.min.js"></script>
+    <script src="./js/popper.min.js"></script>
+    <script src="./js/bootstrap.bundle.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="./js/functions.js"></script>
 </body>

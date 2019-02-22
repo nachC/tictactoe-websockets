@@ -3,12 +3,14 @@ const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 
+const PORT = process.env.PORT || 3000;
+
 const User = require('./models/user');
 const GameState = require('./models/game-state');
 
 //sets the number of the current available room
 let roomNumber = 0;
-//holds all users connected to the server - { client : new User() }
+//holds all users connected to the server - { user : new User() }
 let users = {};
 //holds the game state for each room  - { room : new GameState(...) }
 let roomsGameState = {};
@@ -23,7 +25,6 @@ app.get('/', (req, res) => {
 
 io.on('connection', function (socket) {
   //USER CONNECTS
-  console.log('a user connected');
   users[socket.id] = new User();
 
   if (io.sockets.adapter.rooms[`room ${roomNumber}`] === undefined
@@ -32,10 +33,10 @@ io.on('connection', function (socket) {
     players[socket.id] = false;
     users[socket.id].room = `room ${roomNumber}`;
     socket.join(`room ${roomNumber}`);
-    console.log(`user joined room ${roomNumber}`);
+
+    //console.log('players', players);
 
     if (io.sockets.adapter.rooms[`room ${roomNumber}`].length === 2) {
-      players[socket.id] = false;
       //start game (choose who starts first)
       let firstToPlay = Object.keys(io.sockets.adapter.rooms[users[socket.id].room].sockets)[Math.round(Math.random())];
       players[firstToPlay] = true;
@@ -46,52 +47,55 @@ io.on('connection', function (socket) {
           users[p].symbol = 'O';
         }
       }
-      io.to(`${firstToPlay}`).emit('first to play', 'You play first!');
-
+      
       //set this room's GameState
       roomsGameState[`room ${roomNumber}`] = new GameState(players);
-    }
-  } else {
-    //reset players object for new room
-    players = {};
-    players[socket.id] = false;
 
-    roomNumber++;
-    users[socket.id].room = `room ${roomNumber}`;
-    socket.join(`room ${roomNumber}`);
-    console.log(`sent user to room ${roomNumber}`);
+      io.to(`${firstToPlay}`).emit('first to play', 'You play first!');
+      //reset players object and increase room number for next room
+      players = {};
+      roomNumber++;
+    }
   }
 
-  //PLAY EVENT
-  socket.on('play turn', (cellId) => {
-    if (!roomsGameState[users[socket.id].room].play(socket.id, cellId).error.exists) {
-      //if it's a valid turn -> play
-      console.log('valid turn')
-      socket.emit('valid turn', users[socket.id].symbol);
-      socket.broadcast.to(users[socket.id].room).emit('play turn', {
-        cellId,
-        activeTurn: true,
-        symbol: users[socket.id].symbol
-      });
-    } else {
-      //if it's an invalid turn -> error
-      console.log('invalid turn')
-      console.log(roomsGameState[users[socket.id].room].play(socket.id, cellId).error.message)
+  /////// PLAY EVENT ////////
+  socket.on('play turn', cellId => {
+    if (roomsGameState.hasOwnProperty(users[socket.id].room)) {
+      if (!roomsGameState[users[socket.id].room].play(socket.id, cellId).error.exists) {
+        //if it's a valid turn -> play
+        socket.emit('valid turn', users[socket.id].symbol);
+        socket.broadcast.to(users[socket.id].room).emit('play turn', {
+          cellId,
+          activeTurn: true,
+          symbol: users[socket.id].symbol
+        });
+        if (roomsGameState[users[socket.id].room].getResult()) {
+          io.in(users[socket.id].room).emit('endgame');
+        }
+      } else {
+        //if it's an invalid turn -> error
+        socket.emit('play turn', {
+          activeTurn: false,
+          errorMsg: roomsGameState[users[socket.id].room].play(socket.id, cellId).error.message
+        });
+      }
+    }
+  });
 
-      socket.emit('play turn', {
-        activeTurn: false,
-        errorMsg: roomsGameState[users[socket.id].room].play(socket.id, cellId).error.message
-      });
+  //RESET GAME
+  socket.on('reset game', () => {
+    roomsGameState[users[socket.id].room].reset();
+    if (roomsGameState[users[socket.id].room].getActiveTurn() === socket.id) {
+      socket.emit('first to play', 'You play first!');
     }
   });
 
   //SET USERNAME
-  socket.on('set username', (data) => {
+  socket.on('set username', data => {
     //can't set an empty username nor one with more than 10 chars
     if (data === '') return;
     if (data.length > 10) return;
 
-    console.log(data);
     //set username for this client
     users[socket.id].username = data;
 
@@ -107,7 +111,6 @@ io.on('connection', function (socket) {
         }
         usernames.push(users[user].username);
       }
-      console.log('flag', flag)
       if (flag) {
         //both usernames are set -> send successful reply with usernames
         io.in(`${users[socket.id].room}`).emit('set username', {
@@ -131,6 +134,7 @@ io.on('connection', function (socket) {
     }
   });
 
+
   //////// CHAT EVENTS ///////////
   socket.on('chat message', message => {
     //emits chat message data to all clients but the sender
@@ -139,12 +143,17 @@ io.on('connection', function (socket) {
 
   /////////// EVENT FOR USER DISCONNECTED /////////
   socket.on('disconnect', () => {
-    console.log('user disconnected', users[socket.id]);
     socket.broadcast.to(users[socket.id].room).emit('user disconnect', 'Opponent disconnected');
+
+    //players = {};
+
+    //delete room's GameState
+    delete roomsGameState[users[socket.id].room];
+    //delete user
     delete users[socket.id];
   });
 });
 
-http.listen(3000, () => {
-  console.log('listening on *:3000');
+http.listen(PORT, () => {
+  console.log(`listening on ${PORT}`);
 });

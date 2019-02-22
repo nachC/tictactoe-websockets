@@ -9,9 +9,6 @@ html, body {
     height: 100%;
 }
 
-.bg {
-}
-
 body {
     display: flex;
     flex-direction: column;
@@ -77,6 +74,28 @@ body {
     text-align: center;
 }
 
+.button {
+    border: none;
+    color: white;
+    padding: 5px 17px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.button-outline {
+    background-color: #0B0C10;
+    color: white;
+    border: 1px solid #45A29E;
+}
+
+#reset-btn {
+    display: none;
+}
+
 /* CENTER PANEL - GAME BOARD  */
 #board {
     text-align: center;
@@ -110,6 +129,7 @@ body {
 
 /* RIGHT PANEL - CHAT  */
 .chat-window {
+    pointer-events: none;
     border: solid 1px #45A29E;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -133,22 +153,4 @@ body {
     background-color: #1f2833;
     color: white;
     text-align: center;
-}
-
-.button {
-    border: none;
-    color: white;
-    padding: 5px 17px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
-
-.button-outline {
-    background-color: #0B0C10;
-    color: white;
-    border: 1px solid #45A29E;
 }

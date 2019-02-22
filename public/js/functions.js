@@ -20,7 +20,6 @@ $(function () {
             //if valid, emit 'set username' event to perform server side validation
             // and register the username
             socket.emit('set username', $('#username-input').val());
-            //console.log($('#username-input').val())
             $('#username-input').val('');
         }
     });
@@ -39,16 +38,20 @@ $(function () {
             $('.user-alert').hide();
             $('.card-header').text(data.usernames[0] + ' vs ' + data.usernames[1]);
             $('.card-body').children('#room').text(data.room);
-            $('.card-body').children('#score').text('Score');
+            //$('.card-body').children('#score').text('Score');
             $('.players-info').css('display', 'block');
-            //allow clicking the board after usernames are set
+            //allow clicking the board and chat after usernames are set
             $('#board').css('pointer-events', 'all');
+            $('.chat-window').css('pointer-events', 'all');
         }
     });
 
-    /******* PLAY EVENT *********/
+    /******** PLAY EVENT *********/
     let cellClicked = null;
     $('.cell').click(function () {
+        if($('.turn-alert').css('display') === 'block') {
+            $('.turn-alert').hide();
+        }
         //emit play event when clicking a cell
         socket.emit('play turn', $(this).children('span').attr('id'));
         cellClicked = $(this).children('span');
@@ -56,26 +59,31 @@ $(function () {
 
     //event recived by the client that just played
     //if it was a valid turn, it sets the symbol
-    socket.on('valid turn', (symbol) => {
+    socket.on('valid turn', symbol => {
         cellClicked.text(symbol);
         $('.gameplay-alert').hide();
     });
 
     //event recived when the other player plays
-    socket.on('play turn', (data) => {
+    socket.on('play turn', data => {
         if (!data.activeTurn) {
-            console.log(data.errorMsg)
             $('.gameplay-alert').text(data.errorMsg);
-            $('.gameplay-alert').css('display', 'block')
+            $('.gameplay-alert').css('display', 'block');
         } else if (data.activeTurn) {
-            console.log('valid turn html')
             $('.gameplay-alert').hide();
             $(`#${data.cellId}`).text(data.symbol);
         }
     });
 
-    socket.on('first to play', (msg) => {
-        console.log(msg)
+    socket.on('first to play', msg => {
+        $('.turn-alert').css('display', 'block');
+        $('.turn-alert').text(msg);
+    });
+
+    socket.on('endgame', () => {
+        $('.turn-alert').hide();
+        socket.emit('reset game');
+        $('.cell').children('span').text('');
     });
 
     /******** CHAT EVENT ********/
@@ -87,13 +95,12 @@ $(function () {
         return false;
     });
 
-    socket.on('chat message', (data) => {
+    socket.on('chat message', data => {
         $('#messages').append($('<li>').text('Noob: ' + data));
     });
 
     /******** DISCONNECT EVENT********/
-    socket.on('user disconnect', (data) => {
-        console.log(data)
+    socket.on('user disconnect', data => {
         $('#messages').append($('<li>').text(data));
     });
 });
