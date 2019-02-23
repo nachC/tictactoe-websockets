@@ -2,7 +2,7 @@
 
 Project to introduce myself to websockets (through socket.io).
 
-Herokuapp link: https://bit.ly/2BNP56d
+https://tictactoe-ws.herokuapp.com/
 
 Allows clients to connect, join a room and play games of Tic Tac Toe.
 Features a room chat and multiple rooms.
