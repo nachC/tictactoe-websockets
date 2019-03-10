@@ -1,13 +1,13 @@
 class GameState {
 
     /*
-    Description of input in class constructor 
+    Description of input in class constructor:
     players = {
         player1: booleanValue, //true means it's this player's turn, false means otherwise
         player2: booleanValue
     }
 
-    local object
+    Local object:
     this._players = {
         player1: {
             active: booleanValue, //from players[player1]
@@ -20,18 +20,20 @@ class GameState {
         }
     }
     */
+
     constructor(players) {
         this._players = {};
         for (let player in players) {
             this._players[player] = {
                 active: players[player],
-                selectedCells: []
+                selectedCells: [],
+                score: 0
             }
         }
-        //true means cell is available. false means it isn't
+        // true means cell is available. false means it isn't
         this._cellsArr = [true, true, true, true, true, true, true, true, true];
-        //game ending result (win or tie equals to a value of 'true')
-        this._result = false;
+        // game ending result (win or tie equals to a value of 'true')
+        this._result = 'unfinished';
     }
 
     play(player, cell) {
@@ -57,6 +59,9 @@ class GameState {
         this._cellsArr[cell] = false;
         this._players[player].selectedCells.push(cell);
         this._result = this.checkResult(this._players[player].selectedCells);
+        if(this._result === 'win') {
+            this._players[player].score++;
+        }
 
         for (let p in this._players) {
             if (p === player) {
@@ -71,7 +76,6 @@ class GameState {
     }
 
     checkResult(cells) {
-        if (this._cellsArr.every(e => !e)) return true;
         if (cells.length > 2) {
             if (['0', '1', '2'].every(e => cells.includes(e)) ||
                 ['3', '4', '5'].every(e => cells.includes(e)) ||
@@ -80,9 +84,10 @@ class GameState {
                 ['1', '4', '7'].every(e => cells.includes(e)) ||
                 ['2', '5', '8'].every(e => cells.includes(e)) ||
                 ['0', '4', '8'].every(e => cells.includes(e)) ||
-                ['6', '4', '2'].every(e => cells.includes(e))) return true;
+                ['6', '4', '2'].every(e => cells.includes(e))) return 'win';
         }
-        return false;
+        if (this._cellsArr.every(e => !e)) return 'tie';
+        return 'unfinished';
     }
 
     getResult() {
@@ -95,6 +100,14 @@ class GameState {
         }
     }
 
+    getScore() {
+        let score = {};
+        for (let p in this._players) {
+            score[p] = this._players[p].score;
+        }
+        return score;
+    }
+
     reset() {
         for (let p in this._players) {
             this._players[p].selectedCells = [];
@@ -102,7 +115,7 @@ class GameState {
         for (let i = 0; i < this._cellsArr.length; i++) {
             this._cellsArr[i] = true;
         }
-        this._result = false;
+        this._result = 'unfinished';
     }
 }
 

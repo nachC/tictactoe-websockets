@@ -47,7 +47,7 @@ io.on('connection', function (socket) {
           users[p].symbol = 'O';
         }
       }
-      
+
       //set this room's GameState
       roomsGameState[`room ${roomNumber}`] = new GameState(players);
 
@@ -69,7 +69,15 @@ io.on('connection', function (socket) {
           activeTurn: true,
           symbol: users[socket.id].symbol
         });
-        if (roomsGameState[users[socket.id].room].getResult()) {
+        let result = roomsGameState[users[socket.id].room].getResult();
+        if (result === 'win' || result === 'tie') {
+          if (result === 'win') {
+            let scoreData = {};
+            for(let key in roomsGameState[users[socket.id].room].getScore()) {
+              scoreData[users[key].username] = roomsGameState[users[socket.id].room].getScore()[key]
+            }
+            io.in(users[socket.id].room).emit('update score', scoreData)
+          }
           io.in(users[socket.id].room).emit('endgame');
         }
       } else {

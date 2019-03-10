@@ -38,7 +38,6 @@ $(function () {
             $('.user-alert').hide();
             $('.card-header').text(data.usernames[0] + ' vs ' + data.usernames[1]);
             $('.card-body').children('#room').text(data.room);
-            //$('.card-body').children('#score').text('Score');
             $('.players-info').css('display', 'block');
             //allow clicking the board and chat after usernames are set
             $('#board').css('pointer-events', 'all');
@@ -78,6 +77,14 @@ $(function () {
     socket.on('first to play', msg => {
         $('.turn-alert').css('display', 'block');
         $('.turn-alert').text(msg);
+    });
+
+    socket.on('update score', data => {
+        let str = '';
+        for(let user in data) {
+            str += user + ' ' + data[user] + ' '
+        }
+        $('#score').text(str);
     });
 
     socket.on('endgame', () => {
